@@ -64,7 +64,11 @@ class RecipeCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 5.0),
         child: Text(
           title,
-          style: const TextStyle(fontSize: 19),
+          style: const TextStyle(
+            fontSize: 19,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
           overflow: TextOverflow.ellipsis,
           maxLines: 2,
           textAlign: TextAlign.center,
@@ -108,7 +112,12 @@ class RecipeCard extends StatelessWidget {
             size: 18,
           ),
           const SizedBox(width: 7),
-          Text(label),
+          Text(
+            label, 
+            style: const TextStyle(
+                color: Colors.white,
+              ),
+          ),
         ],
       ),
     );
