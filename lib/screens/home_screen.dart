@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:http_https/model/recipe_api.dart';
+import 'package:http_https/widgets/widgets.dart';
 import 'package:http_https/model/recipe_model.dart';
-import 'package:http_https/widgets/recipe_card.dart';
+import 'package:http_https/model/recipe_api_model.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage>  createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getRecipes() async {
-    _recipes = await RecipeApi.getRecipe();
+    _recipes = await RecipeApiModel.getRecipe();
     setState(() {
       _isLoading = false;
     });
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Icon(Icons.restaurant_menu),
               SizedBox(width: 10),
-              Text('Food Recipe')
+              Text('Goup 10 - Food Recipe')
             ],
           ),
         ),

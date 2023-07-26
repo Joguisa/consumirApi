@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http_https/providers/login_form_provider.dart';
 import 'package:provider/provider.dart';
-
-import 'package:http_https/ui/input_decorations.dart';
 import 'package:http_https/widgets/widgets.dart';
+import 'package:http_https/ui/input_decorations.dart';
+import 'package:http_https/providers/login_form_provider.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -11,30 +10,45 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: AuthBackground(
-            child: SingleChildScrollView(
+      body: AuthBackground(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 250),
+              _LoginCard(),
+              const SizedBox(height: 50),
+              const Text(
+                'Crear una nueva cuenta',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 50),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CardContainer(
       child: Column(
         children: [
-          const SizedBox(height: 250),
-          CardContainer(
-              child: Column(
-            children: [
-              const SizedBox(height: 10),
-              Text('Login', style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 30),
-              ChangeNotifierProvider(
-                  create: (_) => LoginFormProvider(), child: _LoginForm())
-            ],
-          )),
-          const SizedBox(height: 50),
-          const Text(
-            'Crear una nueva cuenta',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          const SizedBox(height: 10),
+          Text(
+            'Login',
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: 50),
+          const SizedBox(height: 30),
+          ChangeNotifierProvider(
+            create: (_) => LoginFormProvider(),
+            child: _LoginForm(),
+          ),
         ],
       ),
-    )));
+    );
   }
 }
 
@@ -52,9 +66,10 @@ class _LoginForm extends StatelessWidget {
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecorations.authInputDecoration(
-                hintText: 'joguisa@gmail.com',
-                labelText: 'Correo electrónico',
-                prefixIcon: Icons.alternate_email_rounded),
+              hintText: 'joguisa@gmail.com',
+              labelText: 'Correo electrónico',
+              prefixIcon: Icons.alternate_email_rounded,
+            ),
             onChanged: (value) => loginForm.email = value,
             validator: (value) {
               String pattern =
@@ -72,9 +87,10 @@ class _LoginForm extends StatelessWidget {
             obscureText: true,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecorations.authInputDecoration(
-                hintText: '*****',
-                labelText: 'Contraseña',
-                prefixIcon: Icons.lock_outline),
+              hintText: '*****',
+              labelText: 'Contraseña',
+              prefixIcon: Icons.lock_outline,
+            ),
             onChanged: (value) => loginForm.password = value,
             validator: (value) {
               return (value != null && value.length >= 6)
@@ -83,46 +99,58 @@ class _LoginForm extends StatelessWidget {
             },
           ),
           const SizedBox(height: 30),
-          MaterialButton(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-              disabledColor: Colors.grey,
-              elevation: 0,
-              color: Colors.deepPurple,
-              onPressed: loginForm.isLoading
-                  ? null
-                  : () async {
-                      FocusScope.of(context).unfocus();
-
-                      if (!loginForm.isValidForm()) return;
-
-                      // Validar las credenciales ingresadas
-                      final isValidCredentials =
-                          loginForm.validateCredentials();
-
-                      if (isValidCredentials) {
-                        loginForm.isLoading = true;
-                        await Future.delayed(const Duration(seconds: 2));
-
-                        // Credenciales válidas, avanzar a la siguiente página
-                        Navigator.pushReplacementNamed(context, 'home');
-                      } else {
-                        // Credenciales incorrectas, mostrar mensaje de error
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Correo o contraseña incorrectos.'),
-                          ),
-                        );
-                      }
-                    },
-              child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                  child: Text(
-                    loginForm.isLoading ? 'Espere' : 'Ingresar',
-                    style: const TextStyle(color: Colors.white),
-                  )))
+          _LoginButton(),
         ],
+      ),
+    );
+  }
+}
+
+class _LoginButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final loginForm = Provider.of<LoginFormProvider>(context);
+
+    return MaterialButton(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      disabledColor: Colors.grey,
+      elevation: 0,
+      color: Colors.deepPurple,
+      onPressed: loginForm.isLoading
+          ? null
+          : () async {
+              FocusScope.of(context).unfocus();
+
+              if (!loginForm.isValidForm()) return;
+
+              // Validar las credenciales ingresadas
+              final isValidCredentials = loginForm.validateCredentials();
+
+              if (isValidCredentials) {
+                loginForm.isLoading = true;
+
+                // Usar Navigator.of(context) antes de la operación asíncrona
+                final navigator = Navigator.of(context);
+
+                await Future.delayed(const Duration(seconds: 2));
+
+                // Credenciales válidas, avanzar a la siguiente página
+                navigator.pushReplacementNamed('home');
+              } else {
+                // Credenciales incorrectas, mostrar mensaje de error
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Correo o contraseña incorrectos.'),
+                  ),
+                );
+              }
+            },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
+        child: Text(
+          loginForm.isLoading ? 'Espere' : 'Ingresar',
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
